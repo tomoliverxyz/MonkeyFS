@@ -3,40 +3,48 @@
 open System
 open Token
 
+// lexer data type
 type Lexer =
     { Input: string
       Position: int
       ReadPosition: int
       Ch: char }
 
+// function to get next character in input
 let peekNextChar (lexer: Lexer): char =
     if lexer.ReadPosition >= lexer.Input.Length
     then Char.MinValue
     else lexer.Input[lexer.ReadPosition]
 
+// function to move the lexer's current position forward on given input
 let readNextChar (lexer: Lexer): Lexer =
     { lexer with
         Position = lexer.ReadPosition
         ReadPosition = lexer.ReadPosition + 1
         Ch = peekNextChar lexer }
 
+// function to create a new lexer
 let newLexer (input: string): Lexer =
     { Input = input
       Position = 0
       ReadPosition = 0
       Ch = Char.MinValue } |> readNextChar
 
+// function to check if current character is a char
 let isChar (ch: char): bool =
     ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch = '_'
 
+// function to check if current character is a number
 let isNumber (ch: char): bool =
     ch >= '0' && ch <= '9'
 
+// function to skip over whitespace for current character
 let rec skipWhitespace (lexer: Lexer): Lexer =
     if lexer.Ch = ' ' || lexer.Ch = '\t' || lexer.Ch = '\n' || lexer.Ch = '\r'
     then readNextChar lexer |> skipWhitespace
     else lexer
 
+// function to keep reading input while the current character matches the current checker (isChar or isNumber)
 let readNextWhile (lexer: Lexer, checker: char -> bool): Lexer*string  =
     let start = lexer.Position
 
@@ -48,6 +56,7 @@ let readNextWhile (lexer: Lexer, checker: char -> bool): Lexer*string  =
     let lexer = read lexer
     lexer, lexer.Input.Substring(start, lexer.Position - start)
 
+// function to read create a token based on the current character
 let readToken (lexer: Lexer): Lexer*Token =
     let lexer = skipWhitespace lexer
 
@@ -89,6 +98,7 @@ let readToken (lexer: Lexer): Lexer*Token =
         in (lexer, newToken (Int (substring |> int), substring))
     | _ -> advance Illegal
 
+// function to generate code tokens
 let rec tokenizeCode (lexer: Lexer): Token seq =
     seq {
         match readToken lexer with

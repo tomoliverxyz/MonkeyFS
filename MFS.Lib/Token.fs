@@ -1,5 +1,6 @@
 ﻿module MFS.Lib.Token
 
+// token data type
 type TokenType =
     | Ident of string
     | Int of int
@@ -31,14 +32,17 @@ type TokenType =
     | Else
     | Return
 
+// token literal data type
 type Token =
     { TokenType: TokenType
       Literal: string }
 
+// function to create a new token
 let newToken (tokenType: TokenType, literal: string): Token =
     { TokenType = tokenType
       Literal = literal }
 
+// function to lookup an identifier
 let lookupIdent (keyword: string): TokenType =
     match keyword with
     | "fn" -> Function
