@@ -1,0 +1,8 @@
+# build folders
+#
+bin/
+obj/
+
+# visual studio
+#
+.vs/
