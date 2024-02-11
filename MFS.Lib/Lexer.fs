@@ -63,7 +63,7 @@ let readToken (lexer: Lexer): Lexer*Token =
     let advance (tokenType: TokenType): Lexer*Token =
         readNextChar lexer, newToken (tokenType, lexer.Ch.ToString())
 
-    let advancePeeked (tokenType: TokenType, peekChar: char) =
+    let advancePeeked (tokenType: TokenType, peekChar: char): Lexer*Token =
         readNextChar lexer |> readNextChar, newToken (tokenType, lexer.Ch.ToString() + peekChar.ToString())
 
     match lexer.Ch with
@@ -100,10 +100,6 @@ let readToken (lexer: Lexer): Lexer*Token =
 
 // function to generate code tokens
 let rec tokenizeCode (lexer: Lexer): Token seq =
-    seq {
-        match readToken lexer with
-        | _, token when token.TokenType = Eof -> yield newToken (Eof, Char.MinValue.ToString())
-        | lexer, token ->
-            yield token
-            yield! tokenizeCode lexer
-    }
+    seq { match readToken lexer with
+          | _, token when token.TokenType = Eof -> yield newToken (Eof, Char.MinValue.ToString())
+          | lexer, token -> yield token; yield! tokenizeCode lexer }
